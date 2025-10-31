@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>New Peer</h1>
+  <form method="post" action="/peers/new" autocomplete="off">
+    <div style="margin-bottom:10px">
+      <label>Label</label><br/>
+      <input type="text" name="label" placeholder="e.g., Corey Laptop" required
+        style="width:100%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb">
+    </div>
+    <div style="margin-bottom:10px">
+      <label>Allowed IPs</label><br/>
+      <input type="text" name="allowed_ips" value="0.0.0.0/0, ::/0"
+        style="width:100%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb">
+      <div class="muted">Default allows full-tunnel. Adjust per policy.</div>
+    </div>
+    <div style="margin-bottom:10px">
+      <label>Persistent Keepalive (seconds)</label><br/>
+      <input type="number" min="0" step="1" name="keepalive" placeholder="e.g., 25"
+        style="width:100%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb">
+    </div>
+    <button class="btn" type="submit">Create</button>
+  </form>
+  <p class="muted" style="margin-top:8px">Private key is generated server-side and not stored; use “Download config” feature in a later step.</p>
+</div>
+{% endblock %}

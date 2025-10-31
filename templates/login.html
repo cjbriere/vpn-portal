@@ -1,7 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="card">
-  <h1>Login (placeholder)</h1>
-  <p>This is a placeholder. Real password + TOTP will be implemented next.</p>
+  <h1>CITS VPN Portal</h1>
+  <p class="muted">Sign in with your username and password.</p>
+  {% if error %}<p style="color:#fca5a5">{{ error }}</p>{% endif %}
+  <form method="post" action="/login" autocomplete="off">
+    <div style="margin-bottom:10px">
+      <label>Username</label><br/>
+      <input type="text" name="username" required style="width:100%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb">
+    </div>
+    <div style="margin-bottom:10px">
+      <label>Password</label><br/>
+      <input type="password" name="password" required style="width:100%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb">
+    </div>
+    <button class="btn" type="submit">Sign in</button>
+  </form>
 </div>
 {% endblock %}
