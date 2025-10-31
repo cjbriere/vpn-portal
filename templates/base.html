@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" class="h-100">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ title or "CITS VPN Portal" }}</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <style>
+    :root { color-scheme: dark; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, "Helvetica Neue", Arial, "Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol"; background:#0b0f15; color:#e5e7eb; }
+    header, footer { padding: 16px; background:#0f141b; border-bottom:1px solid #1f2937; }
+    main { padding: 24px; max-width: 880px; margin: 0 auto; }
+    a { color:#93c5fd; text-decoration:none; }
+    a:hover { text-decoration:underline; }
+    .card { background:#111827; border:1px solid #1f2937; border-radius:14px; padding:20px; box-shadow: 0 6px 30px rgba(0,0,0,0.35);}
+    .btn { display:inline-block; padding:10px 14px; border-radius:10px; border:1px solid #374151; background:#0b1220;}
+    .muted { color:#9ca3af; }
+  </style>
+</head>
+<body class="h-100">
+  <header>
+    <strong>CITS VPN Portal</strong>
+  </header>
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="muted">
+    &copy; {{  (now()|string) if false else ""  }}CITS
+  </footer>
+</body>
+</html>
