@@ -109,11 +109,57 @@ DNS in peer conf = dns_ipv4_json.
 On change: mark configs stale, banner prompt re-download.
 
 ## 14) One-Command Installer
-/usr/local/sbin/cits-install.sh (idempotent)
-Prompts for SITE_FQDN, STATIC_IP, GATEWAY, HOST_DNS, CERTBOT_EMAIL, DB creds, admin creds.
-Actions: installs deps, sets TZ, configures wg0, creates vpnportal user, venv, secret, DB+user, seeds admin, installs systemd units, Nginx vhost, TLS setup.
-Outputs: /var/log/cits-install.log, printed secrets.
---remove disables services, restores configs, keeps DB.
+
+Installer script: `/usr/local/sbin/vpn-install.sh`  
+Purpose: fully set up and configure the VPN portal automatically.  
+Idempotent — safe to re-run anytime.
+
+### Prompts
+- SITE_FQDN (default: vpn.c-itsolutions.com)  
+- STATIC_IP / CIDR  (auto-detected if possible)
+- GATEWAY  (auto-detected if possible)
+- HOST_DNS  (auto-detected if possible)
+- CERTBOT_EMAIL  
+- CLOUDFLARE_TOKEN (Cloudflare **Custom API Token**)  
+- DB_ROOT_PASS  
+- DB_USER / DB_PASS  
+- ADMIN_USER / ADMIN_PASS  
+
+### Actions
+1. Install all required packages (Python, Nginx, MariaDB, WireGuard, Certbot, etc.).  
+2. Set timezone to America/New_York and enable chrony.  
+3. Enable IPv4 forwarding.  
+4. Create system user `vpnportal` with limited sudo access. If user is already created add the limited sudo access
+5. Build Python venv under `/opt/vpn-portal/venv`.  
+6. Create `/etc/vpn-portal/secret` for encryption keys.  
+7. Create database `vpn-portal` and import schema.  
+8. Seed admin user and default site configuration.  
+9. Enable services:  
+   - `vpn-portal.service` (Flask via Gunicorn)  
+   - `vpn-portal-worker.service` (scheduler)  
+10. Configure WireGuard interface `wg0` (no peers).  
+11. Configure Nginx reverse proxy for HTTPS.
+
+### TLS / Certificate Setup
+- Uses Let’s Encrypt with Cloudflare **DNS-01** challenge.  
+- Requires a **Cloudflare Custom API Token** with:
+  - Zone → DNS → Edit  
+  - Zone → Zone → Read  
+  - Restricted to `c-itsolutions.com`
+- Installer saves token to `/root/.secrets/cloudflare.ini` with permission `600`.  
+- Certificates issued and renewed automatically.  
+- Port 80 stays closed; only TCP 443 and UDP 51820 are required.  
+- If token missing, installer creates a self-signed cert for temporary use.  
+- Nginx automatically reloads after successful renewals.
+
+### Outputs
+- Install log: `/var/log/vpn-install.log`  
+- Prints generated credentials once.
+
+### Uninstall (`--remove`)
+- Disables services.  
+- Restores backups under `/var/backups/vpn-install/`.  
+- Database is left intact.
 
 ## 15) Logging & Retention
 Audit logs 90d retention, CSV export, combined filters.
@@ -126,7 +172,7 @@ Chrony sync; UFW open UDP 51820 + web ports; intra-VPN unrestricted.
 /opt/vpn-portal, /etc/vpn-portal/secret, /run/vpn-portal/fg.sock, vpn_portal DB, wg0 interface, default LAN 192.168.1.0/24.
 
 ## 18) Deliverables
-PROJECT_SCOPE.md, COLLABORATION_POLICY.md, README.md, CHANGELOG.md, db/schema.sql, scripts/cits-install.sh, systemd units, nginx conf, sudoers entry, Flask app, templates, static.
+PROJECT_SCOPE.md, COLLABORATION_POLICY.md, README.md, CHANGELOG.md, db/schema.sql, scripts/vpn-install.sh, systemd units, nginx conf, sudoers entry, Flask app, templates, static.
 
 ## 19) Hard Requirements Checklist
 No dnsmasq. Split-tunnel. AllowedIPs = 10.88.0.0/24 + LAN. DNS = site-config. No email. Admin-only users. 2FA mandatory. Runtime peers. 90-day logs. vpnportal user + minimal sudo.
