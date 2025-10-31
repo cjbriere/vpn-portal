@@ -1,26 +1,129 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="card">
-  <h1>CITS VPN Portal — 2FA Setup</h1>
-  {% if already %}
-    <p>2FA is already enabled on your account.</p>
-    <p><a class="btn" href="/dashboard">Back to dashboard</a></p>
-  {% else %}
-    <p class="muted">Scan the QR code with Google Authenticator, 1Password, Microsoft Authenticator, etc., then enter a code to confirm.</p>
-    {% if error %}<p style="color:#fca5a5">{{ error }}</p>{% endif %}
-    <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">
-      <img src="{{ qr_data_uri }}" alt="MFA QR" style="background:#fff;padding:8px;border-radius:8px;border:1px solid #374151">
-      <div>
-        <p><strong>Manual key:</strong> <code>{{ secret }}</code></p>
-        <form method="post" action="/mfa/setup" autocomplete="off">
-          <div style="margin-bottom:10px">
-            <label>Enter a code</label><br/>
-            <input type="text" name="code" inputmode="numeric" pattern="[0-9 ]*" required style="width:100%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb">
-          </div>
-          <button class="btn" type="submit">Enable 2FA</button>
-        </form>
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>{{ title or "CITS VPN Portal — MFA Setup" }}</title>
+  <style>
+    :root {
+      color-scheme: dark;
+    }
+
+    body {
+      margin: 0;
+      background: #0b0f14;
+      color: #e6eef8;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .wrap {
+      max-width: 560px;
+      margin: 6vh auto;
+      padding: 24px;
+      background: #111825;
+      border: 1px solid #1f2a3b;
+      border-radius: 14px;
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 1.25rem;
+      color: #cfe3ff;
+    }
+
+    p {
+      color: #bcd;
+      line-height: 1.5;
+    }
+
+    .card {
+      display: flex;
+      gap: 18px;
+      align-items: center;
+      padding: 18px;
+      background: #0e1623;
+      border: 1px solid #223147;
+      border-radius: 12px;
+    }
+
+    .secret {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      background: #0c1320;
+      padding: 10px 12px;
+      border-radius: 8px;
+      display: inline-block;
+      letter-spacing: 1px;
+    }
+
+    form {
+      margin-top: 18px;
+      display: flex;
+      gap: 10px;
+    }
+
+    input[type="text"] {
+      flex: 1;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #2b3b56;
+      background: #0d1624;
+      color: #e6eef8;
+    }
+
+    button {
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: 1px solid #2b3b56;
+      background: #1a2a44;
+      color: #e6eef8;
+      cursor: pointer;
+    }
+
+    .err {
+      color: #ff8c8c;
+      margin-top: 10px;
+    }
+
+    .qr {
+      width: 160px;
+      height: 160px;
+      background: #0c1320;
+      border: 1px solid #223147;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .meta {
+      font-size: 0.9rem;
+      color: #9db3ce;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <h1>MFA Setup</h1>
+    <p>Scan the QR code below with your authenticator app. If QR fails, add the account using this key:</p>
+    <p class="secret">{{ secret }}</p>
+    <div class="card">
+      <div class="qr">
+        <img src="{{ url_for('mfa.mfa_qr_png') }}" alt="QR code" width="160" height="160" loading="lazy">
+      </div>
+      <div class="meta">
+        <div><strong>User:</strong> {{ username }}</div>
+        <div><strong>Issuer:</strong> CITS VPN Portal</div>
       </div>
     </div>
-  {% endif %}
-</div>
-{% endblock %}
+    <form method="post" action="{{ url_for('mfa.mfa') }}">
+      <input type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="one-time-code" maxlength="6" name="code"
+        placeholder="Enter 6-digit code" required>
+      <button type="submit">Verify &amp; Enable</button>
+    </form>
+    {% if error %}<div class="err">{{ error }}</div>{% endif %}
+  </div>
+</body>
+
+</html>

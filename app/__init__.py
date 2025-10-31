@@ -1,42 +1,24 @@
-import os, logging, pymysql
-from flask import Flask, g, request
-from dotenv import load_dotenv
+# app/__init__.py
+import os
+from flask import Flask
 
 def create_app():
-    load_dotenv("/opt/vpn-portal/.env")
-    app = Flask(__name__, template_folder="../templates", static_folder="../static")
-    app.config["SECRET_KEY"] = os.getenv("SECRET_KEY", "dev-not-secret")
+    app = Flask(__name__, template_folder=os.path.join(os.path.dirname(__file__), "..", "templates"))
+    app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "change-me-in-prod")
 
-    # Blueprints
+    # --- Register blueprints (keep names/paths) ---
     from .auth import bp as auth_bp
-    from .web import bp as web_bp
     app.register_blueprint(auth_bp)
+
+    # web blueprint should already exist and provide `home`
+    from .web import bp as web_bp
     app.register_blueprint(web_bp)
 
-    # Simple session loader: puts session row (dict) in g.session if vpnsess cookie is valid & not expired/revoked
-    from .db import get_conn
-    import pymysql.cursors
-
-    @app.before_request
-    def load_session():
-        g.session = None
-        sid = request.cookies.get("vpnsess")
-        if not sid:
-            return
-        try:
-            conn = get_conn()
-            with conn.cursor(cursor=pymysql.cursors.DictCursor) as cur:
-                cur.execute("""
-                    SELECT s.* FROM sessions s
-                    WHERE s.id=%s AND s.revoked=0 AND s.expires_at > UTC_TIMESTAMP()
-                """, (sid,))
-                row = cur.fetchone()
-                if row:
-                    g.session = row
-        except Exception as e:
-            app.logger.warning("session load failed: %r", e)
+    # new mfa blueprint
+    from .mfa import bp as mfa_bp
+    app.register_blueprint(mfa_bp)
 
     return app
 
-# For gunicorn entry point
+# Gunicorn/wsgi entrypoint convenience
 app = create_app()
