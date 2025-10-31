@@ -64,3 +64,23 @@ Example:
 - Zero data loss: changelog + Git history capture every change.
 - Zero clutter: clean, efficient threads; only actionable work.
 - Zero friction: deliverables ready to extract or drop-in immediately.
+
+## 9. Mandatory requirements
+
+1. All implementation, naming, configuration, and procedural decisions must strictly conform to **PROJECT_SCOPE.md** and **COLLABORATION_POLICY.md**.  
+2. These two documents are the **only authoritative sources** for all technical and operational details, including directory paths, service names, configuration structures, coding conventions, and deployment procedures.  
+3. No prior conversation, historical context, cached assumption, or default model behavior may override, reinterpret, or supplement these documents.  
+4. All version control for this project is governed by the Git repository itself (`.git`). The repository state at `HEAD` is the single source of truth for the assistant and the operator.  
+5. When a new chat session begins, the assistant must:
+   - Load and read the latest committed versions of `PROJECT_SCOPE.md` and `COLLABORATION_POLICY.md` from the active branch.
+   - Use `CHANGELOG.md` as the authoritative timeline of revisions, decisions, and implementation history.
+   - Acknowledge the current commit hash or version tag (e.g., “Loaded PROJECT_SCOPE.md@<commit_hash>”) before performing any work.
+   - Ignore all prior conversational history not reflected in the Git repository.
+6. Any instruction, command, or code output that conflicts with these governing documents or the repository state must be flagged immediately for clarification before proceeding.
+7. The assistant must include an **optional Git update reminder** only after a complete, verifiable step or milestone—not after every command.  
+   Example:
+   ```bash
+   # (optional) record this step once verified
+   git add .
+   git commit -m "Phase 1 - Step 2: environment + venv setup complete"
+   git push
