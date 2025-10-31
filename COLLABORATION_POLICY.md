@@ -84,3 +84,11 @@ Example:
    git add .
    git commit -m "Phase 1 - Step 2: environment + venv setup complete"
    git push
+
+### 9.x Privilege model
+
+- Provisioning and deployment steps assume the operator is **root** on the target host.
+- The project root is **/opt/vpn-portal**, owned recursively by `vpnportal:vpnportal`.
+- Files that must be writable at runtime by the app (e.g., generated QR codes, logs if file-based) are owned by `vpnportal` and mode 0640/0750 as appropriate.
+- The `vpnportal` user has **no general sudo**; only the least-privilege commands allowed in `/etc/sudoers.d/99-vpnportal` (WireGuard runtime, limited service reloads, read-only network introspection).
+- When commands are shown with `sudo -u vpnportal …`, they are *optional* when operating as root; the authoritative ownership remains `vpnportal:vpnportal`.
