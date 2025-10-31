@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>CITS VPN Portal</h1>
+  <p class="muted">Enter the 6-digit code from your authenticator app.</p>
+  {% if error %}<p style="color:#fca5a5">{{ error }}</p>{% endif %}
+  <form method="post" action="/mfa" autocomplete="off">
+    <div style="margin-bottom:10px">
+      <label>Authentication code</label><br/>
+      <input type="text" name="code" inputmode="numeric" pattern="[0-9 ]*" required style="width:100%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb">
+    </div>
+    <button class="btn" type="submit">Verify</button>
+  </form>
+</div>
+{% endblock %}

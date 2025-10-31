@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card">
+  <h1>CITS VPN Portal — 2FA Setup</h1>
+  {% if already %}
+    <p>2FA is already enabled on your account.</p>
+    <p><a class="btn" href="/dashboard">Back to dashboard</a></p>
+  {% else %}
+    <p class="muted">Scan the QR code with Google Authenticator, 1Password, Microsoft Authenticator, etc., then enter a code to confirm.</p>
+    {% if error %}<p style="color:#fca5a5">{{ error }}</p>{% endif %}
+    <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap">
+      <img src="{{ qr_data_uri }}" alt="MFA QR" style="background:#fff;padding:8px;border-radius:8px;border:1px solid #374151">
+      <div>
+        <p><strong>Manual key:</strong> <code>{{ secret }}</code></p>
+        <form method="post" action="/mfa/setup" autocomplete="off">
+          <div style="margin-bottom:10px">
+            <label>Enter a code</label><br/>
+            <input type="text" name="code" inputmode="numeric" pattern="[0-9 ]*" required style="width:100%;padding:8px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb">
+          </div>
+          <button class="btn" type="submit">Enable 2FA</button>
+        </form>
+      </div>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
