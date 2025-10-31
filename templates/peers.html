@@ -1,27 +1,8 @@
-{% extends "base.html" %}
-{% block content %}
-<div class="card">
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Peers – CITS VPN Portal</title></head>
+<body>
   <h1>Peers</h1>
-  <p><a class="btn" href="/peers/new">Add Peer</a></p>
-  <table style="width:100%;border-collapse:collapse">
-    <tr><th style="text-align:left">Label</th><th>Address</th><th>Allowed</th><th>Public Key</th><th>Live</th><th></th></tr>
-    {% for p in peers %}
-    <tr style="border-top:1px solid #1f2937">
-      <td>{{ p.label }}</td>
-      <td><code>{{ p.address_cidr }}</code></td>
-      <td><code>{{ p.allowed_ips }}</code></td>
-      <td style="font-size:12px"><code>{{ p.public_key }}</code></td>
-      <td>
-        {% set livep = live.peers.get(p.public_key) %}
-        {% if livep %}✅{% else %}❌{% endif %}
-      </td>
-      <td>
-        <form method="post" action="/peers/delete/{{ p.id }}" onsubmit="return confirm('Remove peer?');">
-          <button class="btn" type="submit">Delete</button>
-        </form>
-      </td>
-    </tr>
-    {% endfor %}
-  </table>
-</div>
-{% endblock %}
+  <p>Placeholder. You’re logged in.</p>
+</body>
+</html>
